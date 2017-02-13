@@ -1,9 +1,18 @@
 provider "aws" {
-  region     = "us-east-1"
-  shared_credentials_file="~/.aws/credentials"
+  region = "${var.region}" 
+  shared_credentials_file= "/Users/sethrutner/.aws/credentials"
 }
 
 resource "aws_instance" "example" {
-  ami           = "ami-0d729a60"
+  ami           = "${lookup(var.amis, var.region)}"
   instance_type = "t2.micro"
+
+  provisioner "local-exec" {
+    command = "echo ${aws_instance.example.public_ip} > ip_address.txt"
+  }
 }
+
+resource "aws_eip" "ip" {
+  instance ="${aws_instance.example.id}"
+}
+
